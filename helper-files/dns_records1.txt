@@ -20,7 +20,7 @@ github.com
 vimeo.com
 maps.google.com
 linkedin.com
-googleusercontent.com
+mbl.is
 europa.eu
 bbc.co.uk
 bp.blogspot.com
