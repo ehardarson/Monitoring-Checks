@@ -197,3 +197,4 @@ lemonde.fr
 search.google.com
 vox.com
 vg.no
+skatteetaten.no
