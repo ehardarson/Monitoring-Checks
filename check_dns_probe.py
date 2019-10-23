@@ -203,14 +203,3 @@ else:
 # display output.
 print "%s; %s records probed %s failed; average %s percentile response time : %s ms" % (checkResult, len(record_list), failed_counter, int(persentile), round(avr_resp_perc_time, 4))
 sys.exit(nagiosState)
-
-
-
-
-
-
-
-
-
-
-
