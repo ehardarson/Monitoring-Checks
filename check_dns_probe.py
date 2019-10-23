@@ -58,7 +58,7 @@ def detailedUsage():
 # parse the command line switches and arguments
 try:
     try:
-        opts, args = getopt.getopt(sys.argv[1:], "hVH:s:U:P:w:c:v", ["help", "output="])
+        opts, args = getopt.getopt(sys.argv[1:], "hVH:f:s:U:P:w:c:v", ["help", "output="])
     except getopt.GetoptError, err:
         # print help information and exit:
         raise Usage(err)
@@ -73,6 +73,8 @@ for o, a in opts:
             avtimeWARNING = float(a)
         elif o == "-c":
             avtimeCRITICAL = float(a)
+        elif o == "-f":
+            failedCritical = int(a)    
         elif o in ("-s", "--server"):
             dns_server = a
         elif o in ("-P", "--percentile"):
@@ -120,6 +122,12 @@ except NameError:
     print "Error: no URL specified."
     usage()
     sys.exit(3)    
+try:
+    failedCritical
+except NameError:
+    print "Error: no max failed specified."
+    usage()
+    sys.exit(3)
 
 # DNS server
 try:
@@ -149,9 +157,13 @@ except Exception as e:
 # Query each record TODO other that just A records.
 try:
     lookup_result = []
+    failed_counter = 0
     for i in range(1, len(record_list)):
-        result = dns.resolver.query(record_list[i], 'A')
-        lookup_result.append({'record': record_list[i], 'query_time': result.response.time * 1000 })
+        try:
+            result = dns.resolver.query(record_list[i], 'A')
+            lookup_result.append({'record': record_list[i], 'query_time': result.response.time * 1000 })
+        except Exception:
+            failed_counter =+ 1           
 except Exception as e:
     print("UNKNOWN : %s " % (e)) 
     sys.exit(3)
@@ -180,13 +192,16 @@ if float(avr_resp_perc_time) >= avtimeCRITICAL:
 elif float(avr_resp_perc_time) >= avtimeWARNING:
     checkResult="WARNING"
     nagiosState=STATE_WARNING
+elif failed_counter >= failedCritical:
+    checkResult="CRITICAL"
+    nagiosState=STATE_CRITICAL
 else:
     # otherwise it's ok
     checkResult="OK"
     nagiosState=STATE_OK
 
 # display output.
-print "%s; records probed %s; average %s percentile response time : %s ms" % (checkResult, len(record_list), int(persentile), round(avr_resp_perc_time, 4))
+print "%s; %s records probed %s failed; average %s percentile response time : %s ms" % (checkResult, len(record_list), failed_counter, int(persentile), round(avr_resp_perc_time, 4))
 sys.exit(nagiosState)
 
 
