@@ -28,7 +28,7 @@ class Usage(Exception):
         self.msg = err
 
 def usage():
-    print "Usage: check_dns_probe.py -s dns_server -U url -P persentile -w warn_ms -c crit_ms"
+    print "Usage: check_dns_probe.py -s dns_server -U url -P persentile -w warn_ms -c crit_ms -f max_failed"
     print "       check_dns_probe.py -h for detailed help"
     print "       check_dns_probe.py -V for version information"
 
